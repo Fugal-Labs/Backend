@@ -5,7 +5,7 @@
   "main": "server.js",
   "type": "module",
   "scripts": {
-    "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
+    "dev": "tsx watch src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
     "lint": "eslint . --ext .ts",
@@ -14,12 +14,11 @@
     "prepare": "husky"
   },
   "lint-staged": {
-  "*.{ts,js}": [
-    "eslint --fix",
-    "prettier --write"
-  ]
-}
-,
+    "*.{ts,js}": [
+      "eslint --fix",
+      "prettier --write"
+    ]
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -39,6 +38,7 @@
     "lint-staged": "^16.2.7",
     "prettier": "^3.7.3",
     "ts-node-dev": "^2.0.0",
+    "tsx": "^4.21.0",
     "typescript": "^5.9.3"
   }
 }
