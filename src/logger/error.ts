@@ -1,9 +1,9 @@
-import { logger } from "./logger";
-import { getRequestId } from "../middlewares/request.middleware";
+import { logger } from './logger';
+import { getRequestId } from '../middlewares/request.middleware';
 
 export const logError = (err: any, req?: any) => {
   logger.error({
-    type: "error",
+    type: 'error',
     requestId: getRequestId(),
     message: err.message,
     route: req?.originalUrl,

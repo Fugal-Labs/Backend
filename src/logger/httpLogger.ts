@@ -1,6 +1,6 @@
-import pinoHttp from "pino-http";
-import { logger } from "./logger";
-import { getRequestId } from "../middlewares/request.middleware";
+import pinoHttp from 'pino-http';
+import { logger } from './logger';
+import { getRequestId } from '../middlewares/request.middleware';
 
 export const httpLogger = pinoHttp({
   logger,

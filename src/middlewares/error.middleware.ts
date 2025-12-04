@@ -1,15 +1,10 @@
-import { Request, Response, NextFunction } from "express";
-import mongoose from "mongoose";
-import { ApiError } from "../utils/api-errors";
-import { logger } from "../logger/logger";  // from logger/index.ts
-import { getRequestId } from "./request.middleware";
+import { Request, Response } from 'express';
+import mongoose from 'mongoose';
+import { ApiError } from '../utils/api-errors';
+import { logger } from '../logger/logger'; // from logger/index.ts
+import { getRequestId } from './request.middleware';
 
-export const errorHandler = (
-  err: any,
-  req: Request,
-  res: Response,
-  _next: NextFunction
-) => {
+export const errorHandler = (err: any, req: Request, res: Response) => {
   let error = err;
 
   /**
@@ -23,18 +18,11 @@ export const errorHandler = (
   if (!(error instanceof ApiError)) {
     const isMongooseError = error instanceof mongoose.Error;
 
-    const statusCode =
-      error.statusCode ||
-      (isMongooseError ? 400 : 500);
+    const statusCode = error.statusCode || (isMongooseError ? 400 : 500);
 
-    const message = error.message || "Something went wrong";
+    const message = error.message || 'Something went wrong';
 
-    error = new ApiError(
-      statusCode,
-      message,
-      error?.errors || [],
-      error.stack
-    );
+    error = new ApiError(statusCode, message, error?.errors || [], error.stack);
   }
 
   /**
@@ -44,7 +32,7 @@ export const errorHandler = (
   const requestId = getRequestId();
 
   logger.error({
-    type: "API_ERROR",
+    type: 'API_ERROR',
     requestId,
     statusCode: error.statusCode,
     message: error.message,
@@ -55,15 +43,14 @@ export const errorHandler = (
     query: req.query,
     body: Object.keys(req.body || {}).length ? req.body : undefined,
 
-    stack: error.stack, 
+    stack: error.stack,
   });
   return res.status(error.statusCode).json({
-  success: false,
-  statusCode: error.statusCode,
-  message: error.message,
-  errors: error.errors || [],
-  requestId,
-  ...(process.env.NODE_ENV === "development" ? { stack: error.message } : {}),
-});
-
+    success: false,
+    statusCode: error.statusCode,
+    message: error.message,
+    errors: error.errors || [],
+    requestId,
+    ...(process.env.NODE_ENV === 'development' ? { stack: error.message } : {}),
+  });
 };
