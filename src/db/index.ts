@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { ApiError } from '../utils/api-errors';
+import { ApiError } from '../utils/api-errors.js';
 
 export const connectDB = async (): Promise<void> => {
   try {

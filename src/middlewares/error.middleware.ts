@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
 import mongoose from 'mongoose';
-import { ApiError } from '../utils/api-errors';
-import { logger } from '../logger/logger'; // from logger/index.ts
-import { getRequestId } from './request.middleware';
+import { ApiError } from '../utils/api-errors.js';
+import { logger } from '../logger/logger.js'; // from logger/index.ts
+import { getRequestId } from './request.middleware.js';
 
 export const errorHandler = (err: any, req: Request, res: Response) => {
   let error = err;

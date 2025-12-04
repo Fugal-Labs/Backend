@@ -1,9 +1,9 @@
-import { logger } from '../logger/logger';
-import * as userService from '../services/users.service';
+import { logger } from '../logger/logger.js';
+import * as userService from '../services/users.service.js';
 import type { Request, Response } from 'express';
 import { CookieOptions } from 'express';
-import { ApiResponse } from '../utils/api-response';
-import { ApiError } from '../utils/api-errors';
+import { ApiResponse } from '../utils/api-response.js';
+import { ApiError } from '../utils/api-errors.js';
 
 const cookiesOptions: CookieOptions = {
   httpOnly: true,
