@@ -1,6 +1,10 @@
 import express from 'express';
 import cors from "cors";
 import { errorHandler } from './middlewares/error.middleware';
+import { httpLogger } from './logger/httpLogger';
+import {requestIdMiddleware} from './middlewares/request.middleware'
+import { ApiError } from './utils/api-errors';
+
 
 
 const app = express();
@@ -20,8 +24,13 @@ app.use(
   })
 )
 
+app.use(httpLogger);
+app.use(requestIdMiddleware)
+
+
+
 app.get('/', (req, res) => {
-  res.send('Hello, World!');
+  throw new ApiError(500,"SOmehting went wrong")
 });
 
 
