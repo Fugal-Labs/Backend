@@ -1,9 +1,9 @@
-import { logger } from '../logger/logger.js';
 import * as userService from '../services/users.service.js';
 import type { Request, Response } from 'express';
 import { CookieOptions } from 'express';
 import { ApiResponse } from '../utils/api-response.js';
 import { ApiError } from '../utils/api-errors.js';
+import { asyncHandler } from '../utils/asyncHandler.js';
 
 const accessTokenOptions: CookieOptions = {
   httpOnly: true,
@@ -19,121 +19,93 @@ const refreshTokenOptions: CookieOptions = {
   maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
 };
 
-export const registerUser = async (req: Request, res: Response) => {
-  try {
-    let { name, email, password, username } = req.body;
-    name = name.trim();
-    username = username.trim().toLowerCase();
-    email = email.trim().toLowerCase();
-    password = password.trim();
+export const registerUser = asyncHandler(async (req: Request, res: Response) => {
+  let { name, email, password, username } = req.body;
 
-    if (!name || !email || !password || !username) {
-      logger.error('Registration failed: Missing required fields');
-      throw new ApiError(400, 'Name, username, email, and password are required');
-    }
-    const { user, accessToken, refreshToken } = await userService.register({
-      name,
-      email,
-      password,
-      username,
-    });
+  // Validate and sanitize inputs
+  name = name?.trim();
+  username = username?.trim().toLowerCase();
+  email = email?.trim().toLowerCase();
+  password = password?.trim();
 
-    // Set both tokens as HTTP-only cookies
-    res.cookie('accessToken', accessToken, accessTokenOptions);
-    res.cookie('refreshToken', refreshToken, refreshTokenOptions);
-
-    res
-      .status(201)
-      .json(new ApiResponse(201, { user, accessToken }, 'User registered successfully'));
-  } catch (error) {
-    logger.error(`Registration error: ${(error as Error).message}`);
-    throw new ApiError(500, 'Internal server error');
+  if (!name || !email || !password || !username) {
+    throw new ApiError(400, 'Name, username, email, and password are required');
   }
-};
 
-export const loginUser = async (req: Request, res: Response) => {
-  try {
-    let { credential, password } = req.body;
-    credential = credential.trim().toLowerCase();
-    password = password.trim();
-    if (!credential || !password) {
-      logger.error('Login failed: Missing credential or password');
-      throw new ApiError(400, 'Credential and password are required');
-    }
-    const { user, accessToken, refreshToken } = await userService.login({ credential, password });
+  const { user, accessToken, refreshToken } = await userService.register({
+    name,
+    email,
+    password,
+    username,
+  });
 
-    // Set both tokens as HTTP-only cookies
-    res.cookie('accessToken', accessToken, accessTokenOptions);
-    res.cookie('refreshToken', refreshToken, refreshTokenOptions);
+  // Set both tokens as HTTP-only cookies
+  res.cookie('accessToken', accessToken, accessTokenOptions);
+  res.cookie('refreshToken', refreshToken, refreshTokenOptions);
 
-    res
-      .status(200)
-      .json(new ApiResponse(200, { user, accessToken }, 'User logged in successfully'));
-  } catch (error) {
-    logger.error(`Login error: ${(error as Error).message}`);
-    throw new ApiError(500, 'Internal server error');
+  res.status(201).json(new ApiResponse(201, { user, accessToken }, 'User registered successfully'));
+});
+
+export const loginUser = asyncHandler(async (req: Request, res: Response) => {
+  let { credential, password } = req.body;
+
+  // Validate and sanitize inputs
+  credential = credential?.trim().toLowerCase();
+  password = password?.trim();
+
+  if (!credential || !password) {
+    throw new ApiError(400, 'Credential and password are required');
   }
-};
-export const logoutUser = async (req: Request, res: Response) => {
-  try {
-    const userId = req.user!._id;
-    await userService.logout(userId);
 
-    // Clear both cookies
-    res.clearCookie('accessToken', accessTokenOptions);
-    res.clearCookie('refreshToken', refreshTokenOptions);
+  const { user, accessToken, refreshToken } = await userService.login({ credential, password });
 
-    res.status(200).json(new ApiResponse(200, null, 'Logged out successfully'));
-  } catch (error) {
-    logger.error(`Logout error: ${(error as Error).message}`);
-    throw new ApiError(500, 'Internal server error');
+  // Set both tokens as HTTP-only cookies
+  res.cookie('accessToken', accessToken, accessTokenOptions);
+  res.cookie('refreshToken', refreshToken, refreshTokenOptions);
+
+  res.status(200).json(new ApiResponse(200, { user, accessToken }, 'User logged in successfully'));
+});
+
+export const logoutUser = asyncHandler(async (req: Request, res: Response) => {
+  const userId = req.user!._id;
+  await userService.logout(userId);
+
+  // Clear both cookies
+  res.clearCookie('accessToken', accessTokenOptions);
+  res.clearCookie('refreshToken', refreshTokenOptions);
+
+  res.status(200).json(new ApiResponse(200, null, 'Logged out successfully'));
+});
+
+export const getCurrentUser = asyncHandler(async (req: Request, res: Response) => {
+  const userId = req.user!._id;
+  const user = await userService.getCurrentUser(userId);
+  res.status(200).json(new ApiResponse(200, user, 'Current user retrieved successfully'));
+});
+
+export const refreshToken = asyncHandler(async (req: Request, res: Response) => {
+  const refreshToken = req.cookies.refreshToken;
+  if (!refreshToken) {
+    throw new ApiError(401, 'Refresh token missing');
   }
-};
 
-export const getCurrentUser = async (req: Request, res: Response) => {
-  try {
-    const userId = req.user!._id;
-    const user = await userService.getCurrentUser(userId);
-    res.status(200).json(new ApiResponse(200, user, 'Current user retrieved successfully'));
-  } catch (error) {
-    logger.error(`Get current user error: ${(error as Error).message}`);
-    throw new ApiError(500, 'Internal server error');
-  }
-};
+  const { accessToken, refreshToken: newRefreshToken } =
+    await userService.refreshAccessToken(refreshToken);
 
-export const refreshToken = async (req: Request, res: Response) => {
-  try {
-    const refreshToken = req.cookies.refreshToken;
-    if (!refreshToken) {
-      throw new ApiError(401, 'Refresh token missing');
-    }
+  // Set new tokens as HTTP-only cookies
+  res.cookie('accessToken', accessToken, accessTokenOptions);
+  res.cookie('refreshToken', newRefreshToken, refreshTokenOptions);
 
-    const { accessToken, refreshToken: newRefreshToken } =
-      await userService.refreshAccessToken(refreshToken);
+  res.status(200).json(new ApiResponse(200, { accessToken }, 'Token refreshed successfully'));
+});
 
-    // Set new tokens as HTTP-only cookies
-    res.cookie('accessToken', accessToken, accessTokenOptions);
-    res.cookie('refreshToken', newRefreshToken, refreshTokenOptions);
+export const logoutAllDevices = asyncHandler(async (req: Request, res: Response) => {
+  const userId = req.user!._id;
+  await userService.logoutAll(userId);
 
-    res.status(200).json(new ApiResponse(200, { accessToken }, 'Token refreshed successfully'));
-  } catch (error) {
-    logger.error(`Refresh token error: ${(error as Error).message}`);
-    throw new ApiError(401, 'Invalid refresh token');
-  }
-};
+  // Clear both cookies
+  res.clearCookie('accessToken', accessTokenOptions);
+  res.clearCookie('refreshToken', refreshTokenOptions);
 
-export const logoutAllDevices = async (req: Request, res: Response) => {
-  try {
-    const userId = req.user!._id;
-    await userService.logoutAll(userId);
-
-    // Clear both cookies
-    res.clearCookie('accessToken', accessTokenOptions);
-    res.clearCookie('refreshToken', refreshTokenOptions);
-
-    res.status(200).json(new ApiResponse(200, null, 'Logged out from all devices successfully'));
-  } catch (error) {
-    logger.error(`Logout all error: ${(error as Error).message}`);
-    throw new ApiError(500, 'Internal server error');
-  }
-};
+  res.status(200).json(new ApiResponse(200, null, 'Logged out from all devices successfully'));
+});

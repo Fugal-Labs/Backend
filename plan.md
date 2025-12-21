@@ -438,37 +438,37 @@ db.lectureprogress.createIndex({ userId: 1, courseId: 1 });
 ### Authentication Endpoints
 
 ```
-POST   /api/auth/register
+POST   /users/register
   Body: { name, username, email, password }
   Response: { user: {...}, accessToken: "jwt..." }
   Sets: HTTP-only cookies (accessToken + refreshToken)
   Side Effect: Store refreshToken in database
 
-POST   /api/auth/login
+POST   /users/login
   Body: { email | username, password }
   Response: { user: {...}, accessToken: "jwt..." }
   Sets: HTTP-only cookies (accessToken + refreshToken)
   Side Effect: Store refreshToken in database
 
-POST   /api/auth/refresh
+POST   /users/refresh
   Auth: Requires valid refreshToken cookie
   Response: { accessToken: "new-jwt..." }
   Sets: New HTTP-only cookies (accessToken + refreshToken)
   Side Effect: Rotate refreshToken in database
   Note: Called automatically by frontend when accessToken expires
 
-POST   /api/auth/logout
+POST   /users/logout
   Auth: Required
   Response: { message: "Logged out successfully" }
   Clears: HTTP-only cookies
   Side Effect: Remove refreshToken from database
 
-POST   /api/auth/logout-all
+POST   /users/logout-all
   Auth: Required
   Response: { message: "Logged out from all devices" }
   Side Effect: Increment tokenVersion (invalidates all refresh tokens)
 
-GET    /api/auth/me
+GET    /users/me
   Auth: Required (accessToken)
   Response: { user: {...} }
 ```
@@ -480,11 +480,11 @@ GET    /api/auth/me
 **Public (No Auth)**
 
 ```
-GET    /api/problems
+GET    /problems
   Query: ?difficulty=easy&tags=array&page=1&limit=20&status=approved
   Response: { problems: [...], total, page, totalPages }
 
-GET    /api/problems/:slug
+GET    /problems/:slug
   Response: {
     problem: {...},           // Full problem details
     sampleTestCases: [...],   // Only sample type test cases
@@ -495,7 +495,7 @@ GET    /api/problems/:slug
 **Authenticated**
 
 ```
-POST   /api/problems/:slug/submit
+POST   /problems/:slug/submit
   Rate Limit: 5 submissions/minute per user
   Body: { language: 'python', code: '...' }
   Response: {
@@ -513,11 +513,11 @@ POST   /api/problems/:slug/submit
     message: "Wrong Answer on test case 3"
   }
 
-GET    /api/problems/:slug/submissions
+GET    /problems/:slug/submissions
   Query: ?page=1&limit=10
   Response: { submissions: [...], total }
 
-POST   /api/problems/submit-new
+POST   /problems/submit-new
   Rate Limit: 3 problems/hour per user
   Body: { title, description, examples, constraints, tags, templates, testCases }
   Response: { problemId, status: 'pending', message: "Submitted for review" }
@@ -526,17 +526,17 @@ POST   /api/problems/submit-new
 **Admin Only**
 
 ```
-GET    /api/admin/problems/pending
+GET    /admin/problems/pending
   Response: { problems: [...] }
 
-PATCH  /api/admin/problems/:id/approve
+PATCH  /admin/problems/:id/approve
   Response: { message: "Problem approved" }
 
-PATCH  /api/admin/problems/:id/reject
+PATCH  /admin/problems/:id/reject
   Body: { reason: "Insufficient test cases" }
   Response: { message: "Problem rejected" }
 
-POST   /api/admin/problems
+POST   /admin/problems
   Body: { title, slug, difficulty, description, templates, ... }
   Response: { problemId, slug }
 ```
@@ -548,11 +548,11 @@ POST   /api/admin/problems
 **Public**
 
 ```
-GET    /api/courses
+GET    /courses
   Query: ?category=web&level=beginner&page=1&limit=12
   Response: { courses: [...], total, page, totalPages }
 
-GET    /api/courses/:slug
+GET    /courses/:slug
   Response: {
     course: {...},            // Full course with lectures
     isEnrolled: false,        // false if not authenticated
@@ -563,14 +563,14 @@ GET    /api/courses/:slug
 **Authenticated**
 
 ```
-POST   /api/courses/:slug/enroll
+POST   /courses/:slug/enroll
   Response: {
     message: "Enrolled successfully",
     enrollmentId: "..."
   }
   Side Effect: Add to user.enrolledCourses array
 
-GET    /api/courses/:slug/progress
+GET    /courses/:slug/progress
   Response: {
     courseId: "...",
     totalLectures: 24,
@@ -582,29 +582,29 @@ GET    /api/courses/:slug/progress
     ]
   }
 
-POST   /api/courses/:slug/lectures/:lectureId/progress
+POST   /courses/:slug/lectures/:lectureId/progress
   Body: { watchTime: 540, isCompleted: true }
   Response: { message: "Progress updated" }
 
-GET    /api/users/me/courses
+GET    /users/me/courses
   Response: { enrolledCourses: [...] }
 ```
 
 **Admin Only**
 
 ```
-POST   /api/admin/courses
+POST   /admin/courses
   Body: { title, slug, description, category, level, lectures: [...], ... }
   Response: { courseId, slug }
 
-PATCH  /api/admin/courses/:id
+PATCH  /admin/courses/:id
   Body: { title?, description?, lectures?, status?, ... }
   Response: { message: "Course updated" }
 
-DELETE /api/admin/courses/:id
+DELETE /admin/courses/:id
   Response: { message: "Course deleted" }
 
-POST   /api/admin/courses/:id/publish
+POST   /admin/courses/:id/publish
   Response: { message: "Course published" }
 ```
 
@@ -779,7 +779,7 @@ import ReactPlayer from 'react-player';
 **Goal**: Complete LeetCode-style problem system backend
 
 - [ ] **Models**:
-  - [ ] Create `problems.model.ts` (title, slug, difficulty, description, templates, testcases ref)
+  - [ ] Create `problems.model.ts` (title, slug, difficulty, description, templates)
   - [ ] Create `testcases.model.ts` (problemId ref, type: sample/hidden, input/output, limits)
   - [ ] Create `submissions.model.ts` (userId, problemId, code, language, status, results)
 - [ ] **Services**:
@@ -797,11 +797,25 @@ import ReactPlayer from 'react-player';
   - [ ] `rate-limit.middleware.ts` (express-rate-limit: 5 submissions/min, 3 problems/hour)
 - [ ] **Infrastructure**:
   - [ ] Deploy Piston on EC2 (Docker container on port 2000)
-  - [ ] Configure P
+  - [ ] Configure Piston API URL in environment variables
+- [ ] **Test**:
+  - [ ] Create problem → add test cases → submit solution → verify results
+  - [ ] Test all 4 languages (Python, Java, C++, C)
+  - [ ] Test rate limiting (6th submission should fail)
+
+**Deliverable**: Working problem submission and execution system
+
+---
+
+### Phase 2: Problems Route - Frontend (Week 3-4)
+
+**Goal**: Build LeetCode-style UI for problem solving
+
+- [ ] **Dependencies**:
   - [ ] `@uiw/react-codemirror` + language extensions (@codemirror/lang-python, java, cpp)
   - [ ] Set up Tailwind CSS for styling
 - [ ] **Pages**:
-  - [ ] `/problems` - List with filters (difficulty, tags, status) + pagination
+  - [ ] `/problems` - List with filters (difficulty, tags) + pagination
   - [ ] `/problems/[slug]` - Split view (description left, editor + test cases right)
   - [ ] `/problems/submit` - Community submission form (requires auth)
 - [ ] **Components**:
@@ -818,7 +832,18 @@ import ReactPlayer from 'react-player';
 - [ ] **Test**:
   - [ ] Solve problem → submit → see results → check history
   - [ ] Test filter functionality
-  - [ ] Test language switching and code persistence, total problems, submissions)
+  - [ ] Test language switching and code persistence
+
+**Deliverable**: Functional problem-solving interface
+
+---
+
+### Phase 3: Admin Panel for Problems (Week 4-5)
+
+**Goal**: Problem approval and management system
+
+- [ ] **Pages**:
+  - [ ] `/admin/dashboard` - Overview (pending items count, total problems, submissions)
   - [ ] `/admin/problems` - Pending problems review list with approve/reject actions
   - [ ] `/admin/problems/create` - Direct problem creation form (title, description, test cases, templates)
 - [ ] **Components**:
@@ -835,7 +860,17 @@ import ReactPlayer from 'react-player';
 - [ ] **Test**:
   - [ ] Submit problem as user → admin sees in pending list
   - [ ] Admin approves → problem appears in public list
-  - [ ] Admin reje
+  - [ ] Admin rejects → user can see rejection reason
+
+**Deliverable**: Self-sustaining problem platform with community contributions
+
+---
+
+### Phase 4: Courses Route - Backend (Week 5-6)
+
+**Goal**: Build Unacademy-style course backend
+
+- [ ] **Models**:
   - [ ] Create `courses.model.ts` (title, slug, description, lectures array, instructor, category, level)
   - [ ] Create `lectureprogress.model.ts` (userId, courseId, lectureId, isCompleted, watchTime)
 - [ ] **Services**:
@@ -852,6 +887,18 @@ import ReactPlayer from 'react-player';
   - [ ] Each course with 5-10 lectures
   - [ ] Mix of beginner/intermediate levels
 - [ ] **Test**:
+  - [ ] Enroll in course → watch lecture → mark complete → check progress
+  - [ ] Test progress percentage calculation
+
+**Deliverable**: Working course backend with progress tracking
+
+---
+
+### Phase 5: Courses Route - Frontend (Week 6-7)
+
+**Goal**: Build course learning interface
+
+- [ ] **Dependencies**:
   - [ ] `react-player` for YouTube/Vimeo embeds
 - [ ] **Pages**:
   - [ ] `/courses` - Course catalog with filters (category, level) + grid layout
@@ -877,21 +924,18 @@ import ReactPlayer from 'react-player';
   - [ ] Mark lecture complete → UI updates
   - [ ] Check my-courses page shows enrolled courses with progress
 
+**Deliverable**: Functional course learning platform
+
+---
+
+### Phase 6: Admin Panel for Courses (Week 7)
+
+**Goal**: Course creation and management
+
 - [ ] **Pages**:
-  - [ ] `/admin/dashboard` - Overview (pending items count)
-  - [ ] `/admin/problems` - Pending problems review
-  - [ ] `/admin/problems/create` - Direct problem creation
-- [ ] **Components**:
-  - [ ] `ProblemReviewCard.tsx` - Approve/reject UI
-  - [ ] `RejectModal.tsx` - Rejection reason form
-- [ ] **Seed**: Create initial 100 approved problems
-- [ ] **Database**: Seed 1 admin user
-- [ ] **Test**: Submit problem → admin approves → appears in list
-
-**Deliverable**: Self-sustaining problem plat (list with edit/delete/publish actions)
-
-- [ ] `/admin/courses/create` - Create new course form
-- [ ] `/admin/courses/[id]/edit` - Edit existing course (same form as create)
+  - [ ] `/admin/courses` - Manage all courses (list with edit/delete/publish actions)
+  - [ ] `/admin/courses/create` - Create new course form
+  - [ ] `/admin/courses/[id]/edit` - Edit existing course (same form as create)
 - [ ] **Components**:
   - [ ] `CourseForm.tsx` - Create/edit form (title, description, category, level, thumbnail)
   - [ ] `LectureManager.tsx` - Add/remove/reorder lectures with drag-and-drop
@@ -905,7 +949,19 @@ import ReactPlayer from 'react-player';
 - [ ] **Test**:
   - [ ] Create course with all details
   - [ ] Add multiple lectures with reordering
-  - [ ] Save as draft → edit later (auth, submissions, API calls)
+  - [ ] Save as draft → edit later → publish
+  - [ ] Published course appears in public catalog
+
+**Deliverable**: Complete course management system
+
+---
+
+### Phase 7: Polish & Launch (Week 8)
+
+**Goal**: Production readiness
+
+- [ ] **Security**:
+  - [ ] Add rate limiting to all endpoints
   - [ ] Validate all user inputs with Zod schemas (frontend + backend)
   - [ ] Test authentication edge cases (expired tokens, invalid tokens, concurrent logins)
   - [ ] Add CSRF protection
@@ -947,57 +1003,7 @@ import ReactPlayer from 'react-player';
   - [ ] Set up error tracking (optional: Sentry)
   - [ ] Monitor server resources (CPU, RAM, disk)
   - [ ] Set up uptime monitoring
-  - [ ] Log aggregation for production logsr`
-- [ ] **Pages**:
-  - [ ] `/courses` - Course catalog with filters
-  - [ ] `/courses/[slug]` - Course detail + curriculum
-  - [ ] `/courses/[slug]/learn` - Learning interface
-  - [ ] `/courses/my-courses` - User's enrolled courses
-- [ ] **Components**:
-  - [ ] `CourseCard.tsx` - Catalog item
-  - [ ] `VideoPlayer.tsx` - React Player wrapper
-  - [ ] `CurriculumList.tsx` - Lecture sidebar
-  - [ ] `ProgressBar.tsx` - Visual progress indicator
-- [ ] **API Integration**: Connect to backend
-- [ ] **Test**: Browse → enroll → watch lectures → mark complete
-
-**Deliverable**: Functional course learning platform
-
----
-
-### Phase 6: Admin Panel for Courses (Week 7)
-
-**Goal**: Course creation and management
-
-- [ ] **Pages**:
-  - [ ] `/admin/courses` - Manage all courses
-  - [ ] `/admin/courses/create` - Create new course
-  - [ ] `/admin/courses/[id]/edit` - Edit existing course
-- [ ] **Components**:
-  - [ ] `CourseForm.tsx` - Create/edit form with lectures
-  - [ ] `LectureManager.tsx` - Add/remove/reorder lectures
-- [ ] **Test**: Create course → add lectures → publish → visible to users
-
-**Deliverable**: Complete course management system
-
----
-
-### Phase 7: Polish & Launch (Week 8)
-
-**Goal**: Production readiness
-
-- [ ] **Security**:
-  - [ ] Add rate limiting to all endpoints
-  - [ ] Validate all user inputs (Zod schemas)
-  - [ ] Test authentication edge cases
-- [ ] **Performance**:
-  - [ ] Add database indexes (from schema section)
-  - [ ] Optimize queries (use .select() to limit fields)
-  - [ ] Add loading states to frontend
-- [ ] **UX**:
-  - [ ] Error messages for all failure scenarios
-  - [ ] Success notifications
-  - [ ] Empty states (no problems solved, no enrolled courses)
+  - [ ] Log aggregation for production logs
   - [ ] Responsive design (mobile-friendly)
 - [ ] **Deployment**:
   - [ ] Deploy backend to EC2

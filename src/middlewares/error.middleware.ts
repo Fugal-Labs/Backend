@@ -1,10 +1,10 @@
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import mongoose from 'mongoose';
 import { ApiError } from '../utils/api-errors.js';
-import { logger } from '../logger/logger.js'; // from logger/index.ts
+import { logger } from '../logger/logger.js';
 import { getRequestId } from './request.middleware.js';
 
-export const errorHandler = (err: any, req: Request, res: Response) => {
+export const errorHandler = (err: any, req: Request, res: Response, _next: NextFunction) => {
   let error = err;
 
   /**

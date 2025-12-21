@@ -185,8 +185,6 @@ userSchema.set('toJSON', {
 });
 
 // Indexes (as per plan.md schema)
-userSchema.index({ email: 1 }, { unique: true });
-userSchema.index({ username: 1 }, { unique: true });
 userSchema.index({ role: 1 });
 userSchema.index({ refreshToken: 1 });
 
