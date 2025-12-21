@@ -4,7 +4,7 @@ import type { RegistrationData, User, LoginData } from '../types/users.type.js';
 
 export const register = async (
   userData: RegistrationData
-): Promise<{ user: User; token: string }> => {
+): Promise<{ user: User; accessToken: string; refreshToken: string }> => {
   const existingUser = await UserModel.findOne({ email: userData.email });
   if (existingUser) {
     logger.warn(`Registration attempt with existing email: ${userData.email}`);
@@ -13,13 +13,22 @@ export const register = async (
   const newUser = new UserModel(userData);
   await newUser.save();
   logger.info(`New user registered: ${newUser.email}`);
-  const token = newUser.generateAuthToken();
+
+  // Generate both tokens
+  const accessToken = newUser.generateAccessToken();
+  const refreshToken = newUser.generateRefreshToken();
+
+  // Store refresh token in database
+  newUser.refreshToken = refreshToken;
   await newUser.save();
-  logger.info(`Token generated for user: ${newUser.email}`);
-  return { user: newUser, token };
+
+  logger.info(`Tokens generated for user: ${newUser.email}`);
+  return { user: newUser, accessToken, refreshToken };
 };
 
-export const login = async (userData: LoginData): Promise<{ user: User; token: string }> => {
+export const login = async (
+  userData: LoginData
+): Promise<{ user: User; accessToken: string; refreshToken: string }> => {
   const user = await UserModel.findOne({
     $or: [{ email: userData.credential }, { username: userData.credential }],
   });
@@ -32,10 +41,17 @@ export const login = async (userData: LoginData): Promise<{ user: User; token: s
     logger.warn(`Invalid password attempt for credential: ${userData.credential}`);
     throw new Error('Invalid email or password');
   }
-  const token = user.generateAuthToken();
+
+  // Generate both tokens
+  const accessToken = user.generateAccessToken();
+  const refreshToken = user.generateRefreshToken();
+
+  // Store refresh token in database
+  user.refreshToken = refreshToken;
   await user.save();
+
   logger.info(`User logged in: ${userData.credential}`);
-  return { user, token };
+  return { user, accessToken, refreshToken };
 };
 
 export const logout = async (userId: string): Promise<void> => {
@@ -44,7 +60,8 @@ export const logout = async (userId: string): Promise<void> => {
     logger.warn(`Logout attempt for non-existing user ID: ${userId}`);
     throw new Error('User not found');
   }
-  user.token = undefined;
+  // Remove refresh token from database
+  user.refreshToken = undefined;
   await user.save();
   logger.info(`User logged out: ${user.email}`);
 };
@@ -56,4 +73,47 @@ export const getCurrentUser = async (userId: string): Promise<User> => {
     throw new Error('User not found');
   }
   return user;
+};
+
+export const refreshAccessToken = async (
+  refreshToken: string
+): Promise<{ accessToken: string; refreshToken: string }> => {
+  const user = await UserModel.findOne({ refreshToken });
+  if (!user) {
+    logger.warn('Refresh token not found in database');
+    throw new Error('Invalid refresh token');
+  }
+
+  // Verify the refresh token
+  const isValid = await user.verifyRefreshToken(refreshToken);
+  if (!isValid) {
+    logger.warn(`Invalid refresh token for user: ${user.email}`);
+    throw new Error('Invalid refresh token');
+  }
+
+  // Generate new tokens (token rotation)
+  const newAccessToken = user.generateAccessToken();
+  const newRefreshToken = user.generateRefreshToken();
+
+  // Store new refresh token in database
+  user.refreshToken = newRefreshToken;
+  await user.save();
+
+  logger.info(`Tokens refreshed for user: ${user.email}`);
+  return { accessToken: newAccessToken, refreshToken: newRefreshToken };
+};
+
+export const logoutAll = async (userId: string): Promise<void> => {
+  const user = await UserModel.findById(userId);
+  if (!user) {
+    logger.warn(`Logout all attempt for non-existing user ID: ${userId}`);
+    throw new Error('User not found');
+  }
+
+  // Increment token version to invalidate all refresh tokens
+  user.tokenVersion += 1;
+  user.refreshToken = undefined;
+  await user.save();
+
+  logger.info(`User logged out from all devices: ${user.email}`);
 };

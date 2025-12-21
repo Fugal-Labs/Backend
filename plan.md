@@ -753,15 +753,15 @@ import ReactPlayer from 'react-player';
   - [x] Sensitive data redaction (passwords, tokens, auth headers)
   - [x] Configurable log levels (trace, debug, info, warn, error, fatal)
   - [x] Fixed dotenv loading order with `import 'dotenv/config'`
-- [ ] **Backend**: Remove old token field from User model
-- [ ] **Backend**: Add refreshToken, tokenVersion, role, solvedProblems, enrolledCourses to User model
-- [ ] **Backend**: Create token utility functions (generateAccessToken, generateRefreshToken, verifyToken)
-- [ ] **Backend**: Update auth middleware (verify access token, no DB lookup for performance)
-- [ ] **Backend**: Update login/register services (generate both tokens, store refreshToken in DB)
-- [ ] **Backend**: Create refresh token endpoint (/api/auth/refresh)
-- [ ] **Backend**: Update logout service (remove refreshToken from DB)
-- [ ] **Backend**: Create logout-all endpoint (increment tokenVersion)
-- [ ] **Backend**: Create admin middleware (check role='admin')
+- [x] **Backend**: Remove old token field from User model
+- [x] **Backend**: Add refreshToken, tokenVersion, role, solvedProblems, enrolledCourses to User model
+- [x] **Backend**: Create token utility functions (generateAccessToken, generateRefreshToken, verifyToken)
+- [x] **Backend**: Update auth middleware (verify access token, no DB lookup for performance)
+- [x] **Backend**: Update login/register services (generate both tokens, store refreshToken in DB)
+- [x] **Backend**: Create refresh token endpoint (/api/auth/refresh)
+- [x] **Backend**: Update logout service (remove refreshToken from DB)
+- [x] **Backend**: Create logout-all endpoint (increment tokenVersion)
+- [x] **Backend**: Create admin middleware (check role='admin')
 - [ ] **Frontend**: Create API client library (`lib/api/client.ts`) with auto-refresh logic
 - [ ] **Frontend**: Create AuthProvider context with token refresh handling
 - [ ] **Frontend**: Build login/register pages

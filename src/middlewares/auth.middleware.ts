@@ -6,32 +6,48 @@ declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Express {
     interface Request {
-      user?: { id: string; email: string };
+      user?: { _id: string; email: string; role: string };
     }
   }
 }
 
-export const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
+export const verifyAccessToken = (req: Request, res: Response, next: NextFunction) => {
   try {
-    const token = req.cookies.token;
+    const token = req.cookies.accessToken;
     if (!token) {
       return res.status(401).json({ message: 'Authentication token missing' });
     }
 
-    if (!process.env.JWT_SECRET) {
-      logger.error('JWT_SECRET is not defined');
+    if (!process.env.ACCESS_TOKEN_SECRET) {
+      logger.error('ACCESS_TOKEN_SECRET is not defined');
       return res.status(500).json({ message: 'Server configuration error' });
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET) as {
+    const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET) as {
       _id: string;
       email: string;
+      role: string;
     };
 
-    req.user = { id: decoded._id, email: decoded.email };
+    req.user = { _id: decoded._id, email: decoded.email, role: decoded.role };
     next();
   } catch (error) {
     logger.error(`Authentication error: ${(error as Error).message}`);
     return res.status(401).json({ message: 'Invalid authentication token' });
   }
+};
+
+// Admin middleware - checks if user has admin role
+export const verifyAdmin = (req: Request, res: Response, next: NextFunction) => {
+  if (!req.user) {
+    logger.error('Admin check failed: No user in request');
+    return res.status(401).json({ message: 'Authentication required' });
+  }
+
+  if (req.user.role !== 'admin') {
+    logger.warn(`Admin access denied for user: ${req.user.email}`);
+    return res.status(403).json({ message: 'Admin access required' });
+  }
+
+  next();
 };
