@@ -1,8 +1,8 @@
 // Load environment variables first before any other imports
 import 'dotenv/config';
 
-import app from './app.js';
-import { connectDB } from './db/index.js';
+import app from './app';
+import { connectDB } from './db/index';
 
 const port = process.env.PORT || 3000;
 

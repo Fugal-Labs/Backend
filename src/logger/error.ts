@@ -1,5 +1,5 @@
-import { logger } from './logger.js';
-import { getRequestId } from '../middlewares/request.middleware.js';
+import { logger } from './logger';
+import { getRequestId } from '@/middlewares/request.middleware';
 
 export const logError = (err: any, req?: any) => {
   logger.error({

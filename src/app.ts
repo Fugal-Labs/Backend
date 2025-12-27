@@ -1,10 +1,10 @@
 import express from 'express';
 import cors from 'cors';
-import { errorHandler } from './middlewares/error.middleware.js';
-import { httpLogger } from './logger/httpLogger.js';
-import { requestIdMiddleware } from './middlewares/request.middleware.js';
+import { errorHandler } from './middlewares/error.middleware';
+import { httpLogger } from './logger/httpLogger';
+import { requestIdMiddleware } from './middlewares/request.middleware';
 import cookieParser from 'cookie-parser';
-import userRouter from './routes/users.routes.js';
+import userRouter from './routes/users.routes';
 
 const app = express();
 app.use(

@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import { logger } from '../logger/logger.js';
+import { logger } from '@/logger/logger';
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace

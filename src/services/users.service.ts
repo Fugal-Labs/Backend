@@ -1,6 +1,6 @@
-import { logger } from '../logger/logger.js';
-import UserModel from '../models/users.model.js';
-import type { RegistrationData, User, LoginData } from '../types/users.type.js';
+import { logger } from '@/logger/logger';
+import UserModel from '@/models/users.model';
+import type { RegistrationData, User, LoginData } from '@/types/users.type';
 
 export const register = async (
   userData: RegistrationData

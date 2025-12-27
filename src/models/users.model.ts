@@ -1,8 +1,8 @@
 import mongoose from 'mongoose';
-import type { User } from '../types/users.type.js';
+import type { User } from '@/types/users.type';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
-import { logger } from '../logger/logger.js';
+import { logger } from '@/logger/logger';
 
 interface UserMethods {
   isPasswordCorrect(password: string): Promise<boolean>;
