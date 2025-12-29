@@ -8,6 +8,6 @@ export const logError = (err: any, req?: any) => {
     message: err.message,
     route: req?.originalUrl,
     method: req?.method,
-    stack: err.stack,
+    stack: process.env.NODE_ENV === 'production' ? undefined : err.stack,
   });
 };

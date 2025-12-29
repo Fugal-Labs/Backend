@@ -1,4 +1,4 @@
-import { pinoHttp } from 'pino-http';
+import pinoHttp from 'pino-http';
 import { logger } from './logger';
 import { getRequestId } from '@/middlewares/request.middleware';
 
@@ -22,11 +22,17 @@ export const httpLogger = pinoHttp({
     },
   },
 
+  customLogLevel(_req, res, _err) {
+    if (res.statusCode >= 500) return 'error';
+    if (res.statusCode >= 400) return 'warn';
+    return 'info';
+  },
+
   customSuccessMessage(req, res) {
-    return `SUCCESS ${req.method} ${req.url} → ${res.statusCode}`;
+    return `${req.method} ${req.url} → ${res.statusCode}`;
   },
 
   customErrorMessage(req, res, err) {
-    return `ERROR ${req.method} ${req.url}: ${err.message}`;
+    return `${req.method} ${req.url} → ${res.statusCode} (${err?.message})`;
   },
 });

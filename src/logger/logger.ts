@@ -86,6 +86,7 @@ export const logger = pino({
       'token',
       'accessToken',
       'refreshToken',
+      'otp',
     ],
     censor: '***REDACTED***',
   },
