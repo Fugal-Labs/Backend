@@ -42,6 +42,7 @@ export interface RegistrationData {
   password: string;
   name: string;
   username: string;
+  otp: string;
 }
 
 export interface LoginData {

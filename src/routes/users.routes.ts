@@ -1,8 +1,11 @@
 import * as userController from '@/controller/users.controller';
 import { Router } from 'express';
 import { verifyAccessToken } from '@/middlewares/auth.middleware';
+import { ipRateLimiter } from '@/middlewares/ipRateLimitter';
 
 const router = Router();
+
+router.use(ipRateLimiter);
 
 // Public routes
 router.post('/register', userController.registerUser);

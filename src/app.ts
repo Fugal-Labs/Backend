@@ -5,6 +5,7 @@ import { httpLogger } from './logger/httpLogger';
 import { requestIdMiddleware } from './middlewares/request.middleware';
 import cookieParser from 'cookie-parser';
 import userRouter from './routes/users.routes';
+import otpRouter from './routes/otp.routes';
 
 const app = express();
 app.use(
@@ -29,6 +30,7 @@ app.use(httpLogger);
 app.use(requestIdMiddleware);
 
 app.use('/users', userRouter);
+app.use('/otp', otpRouter);
 
 app.use(errorHandler);
 

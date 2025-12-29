@@ -28,6 +28,7 @@
   "packageManager": "pnpm@10.24.0",
   "dependencies": {
     "@types/cookie-parser": "^1.4.10",
+    "@types/nodemailer": "^7.0.4",
     "async_hooks": "^1.0.0",
     "bcrypt": "^6.0.0",
     "cls-hooked": "^4.2.2",
@@ -36,10 +37,13 @@
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "express-validator": "^7.3.1",
+    "ioredis": "^5.8.2",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.0.0",
+    "nodemailer": "^7.0.12",
     "pino": "^10.1.0",
     "pino-http": "^11.0.0",
+    "resend": "^6.6.0",
     "uuid": "^13.0.0"
   },
   "devDependencies": {

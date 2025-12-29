@@ -1,6 +1,7 @@
 import { logger } from '@/logger/logger';
 import UserModel from '@/models/users.model';
 import type { RegistrationData, User, LoginData } from '@/types/users.type';
+import { verifyOtp } from './otp.service';
 
 export const register = async (
   userData: RegistrationData
@@ -10,6 +11,10 @@ export const register = async (
     logger.warn(`Registration attempt with existing email: ${userData.email}`);
     throw new Error('User with this email already exists');
   }
+
+  // Verify OTP before proceeding with registration
+  await verifyOtp(userData.email, userData.otp);
+
   const newUser = new UserModel(userData);
   await newUser.save();
   logger.info(`New user registered: ${newUser.email}`);

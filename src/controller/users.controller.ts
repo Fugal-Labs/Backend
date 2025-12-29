@@ -20,16 +20,17 @@ const refreshTokenOptions: CookieOptions = {
 };
 
 export const registerUser = asyncHandler(async (req: Request, res: Response) => {
-  let { name, email, password, username } = req.body;
+  let { name, email, password, username, otp } = req.body;
 
   // Validate and sanitize inputs
   name = name?.trim();
   username = username?.trim().toLowerCase();
   email = email?.trim().toLowerCase();
   password = password?.trim();
+  otp = otp?.trim();
 
-  if (!name || !email || !password || !username) {
-    throw new ApiError(400, 'Name, username, email, and password are required');
+  if (!name || !email || !password || !username || !otp) {
+    throw new ApiError(400, 'Name, username, email, password, and OTP are required');
   }
 
   const { user, accessToken, refreshToken } = await userService.register({
@@ -37,6 +38,7 @@ export const registerUser = asyncHandler(async (req: Request, res: Response) => 
     email,
     password,
     username,
+    otp,
   });
 
   // Set both tokens as HTTP-only cookies
