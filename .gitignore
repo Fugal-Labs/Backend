@@ -8,3 +8,5 @@ logs/
 Thumbs.ds
 
 AGENT_RULES.md
+.env
+.env.*
