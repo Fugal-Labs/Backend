@@ -1,15 +1,15 @@
-/* =========================================
-   Example shown to users
-========================================= */
+
+  //  Example shown to users
+
 export interface ProblemExample {
   input: string;
   output: string;
   explanation: string;
 }
 
-/* =========================================
-   Code templates for each language
-========================================= */
+
+  //  Code templates for each language
+
 export interface ProblemTemplates {
   python: string;
   java: string;
@@ -17,9 +17,9 @@ export interface ProblemTemplates {
   c: string;
 }
 
-/* =========================================
-   Main Problem Interface
-========================================= */
+
+  //  Main Problem Interface
+
 export interface Problem {
   _id: string;
   title: string;
