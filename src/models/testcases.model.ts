@@ -1,5 +1,6 @@
 
 import mongoose from 'mongoose';
+import type { Types } from 'mongoose';
 import type { TestCase } from '@/types/testcases.type';
 
 type TestCaseModelType = mongoose.Model<TestCase,Record<string, never>>;
@@ -30,7 +31,6 @@ const testCaseSchema = new mongoose.Schema<TestCase, TestCaseModelType>(
 
     timeLimit: {
       type: Number,
-      required: true,
       default: 2000,
     },
 
@@ -51,7 +51,11 @@ const testCaseSchema = new mongoose.Schema<TestCase, TestCaseModelType>(
 );
 
 // Compound index (IMPORTANT for performance)
-testCaseSchema.index({ problemId: 1, type: 1, order: 1 });
+testCaseSchema.index(
+  { problemId: 1, type: 1, order: 1 },
+  { unique: true } 
+);
+
 
 const TestCaseModel = mongoose.model<TestCase, TestCaseModelType>(
   'TestCase',

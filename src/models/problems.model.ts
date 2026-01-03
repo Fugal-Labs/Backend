@@ -1,7 +1,6 @@
 import mongoose from 'mongoose';
+import type { Types } from 'mongoose';
 import type { Problem } from '@/types/problems.type';
-import User from '@/models/users.model';
-
 //model type
 
 type ProblemModelType = mongoose.Model<
@@ -67,7 +66,6 @@ const problemSchema = new mongoose.Schema<Problem, ProblemModelType>(
      submittedBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
-      required: true, 
     },
 
     approvedBy: {
@@ -85,7 +83,10 @@ const problemSchema = new mongoose.Schema<Problem, ProblemModelType>(
   
     rejectionReason: {
       type: String,
-      required: true,
+      required: function (this:any) {
+      return this.status === 'rejected';
+    },
+
     },
 
     totalSubmissions: {
