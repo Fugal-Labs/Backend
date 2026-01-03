@@ -93,23 +93,27 @@ const problemSchema = new mongoose.Schema<Problem, ProblemModelType>(
     totalSubmissions: {
       type: Number,
       required: true,
-      default: 0,
+      
     },
 
     acceptedSubmissions: {
       type: Number,
       required: true,
-      default: 0,
-    },
-
-    acceptanceRate: {
-      type: Number,
-      required: true,
-      default: 0,
     },
   },
-  { timestamps: true }
+   {
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+  },
 );
+
+//acceptance rate 
+
+problemSchema.virtual("acceptanceRate").get(function () {
+  if (this.totalSubmissions === 0) return 0;
+
+  return (this.acceptedSubmissions / this.totalSubmissions) * 100;
+});
 
 //indexes
 problemSchema.index({ slug: 1 }, { unique: true });

@@ -36,11 +36,11 @@ export interface Problem {
   status: 'draft' | 'pending' | 'approved' | 'rejected';
   submittedBy?: string;     // User _id
   approvedBy?: string;      // User _id
-  rejectionReason: string;
+  rejectionReason?: string;
 
   totalSubmissions: number;
   acceptedSubmissions: number;
-  acceptanceRate: number;
+  acceptanceRate?: number;
 
   createdAt: Date;
   updatedAt: Date;
