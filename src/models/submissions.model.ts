@@ -1,8 +1,5 @@
 import mongoose from 'mongoose';
 import type { Submission, TestResult } from '@/types/submission.type';
-import UserModel from '@/models/users.model';
-import ProblemModel from '@/models/problems.model';
-import TestCaseModel from '@/models/testcases.model';
 
 type SubmissionModelType = mongoose.Model<Submission>;
 

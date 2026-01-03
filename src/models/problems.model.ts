@@ -1,4 +1,4 @@
-import mongoose, { model } from 'mongoose';
+import mongoose from 'mongoose';
 import type { Problem } from '@/types/problems.type';
 import UserModel from '@/models/users.model';
 
@@ -42,7 +42,7 @@ const problemSchema = new mongoose.Schema<Problem, ProblemModelType>(
       {
         input: { type: String, required: true },
         output: { type: String, required: true },
-        explanation: { type: String, required: true },
+        explanation: { type: String },
       },
     ],
 
@@ -64,27 +64,25 @@ const problemSchema = new mongoose.Schema<Problem, ProblemModelType>(
       c: { type: String, required: true },
     },
 
-    status: {
-      type: String,
-      enum: ['draft', 'pending', 'approved', 'rejected'],
-      required: true,
-      default: 'draft',
-    },
-
-    submittedBy: {
+     submittedBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'UserModel',
       required: true, 
-      default: null,
     },
 
     approvedBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'UserModel',
-      required: true,
-      default: null,
+      default: null, 
     },
 
+    status: {
+      type: String,
+      enum: ['pending', 'approved', 'rejected'],
+      default: 'pending',
+    },
+
+  
     rejectionReason: {
       type: String,
       required: true,

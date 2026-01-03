@@ -1,7 +1,6 @@
 
 import mongoose from 'mongoose';
 import type { TestCase } from '@/types/testcases.type';
-import ProblemModel from '@/models/problems.model';
 
 type TestCaseModelType = mongoose.Model<TestCase,Record<string, never>>;
 

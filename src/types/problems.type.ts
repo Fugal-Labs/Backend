@@ -4,7 +4,7 @@
 export interface ProblemExample {
   input: string;
   output: string;
-  explanation: string;
+  explanation?: string;
 }
 
 
@@ -33,9 +33,9 @@ export interface Problem {
 
   templates: ProblemTemplates;
 
-  status: 'draft' | 'pending' | 'approved' | 'rejected';
-  submittedBy?: string;     // User _id
-  approvedBy?: string;      // User _id
+  status: 'pending' | 'approved' | 'rejected';
+  submittedBy?: string|null;     // User _id
+  approvedBy?: string | null;      // User _id
   rejectionReason?: string;
 
   totalSubmissions: number;
