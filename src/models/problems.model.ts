@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import type { Problem } from '@/types/problems.type';
-import UserModel from '@/models/users.model';
+import User from '@/models/users.model';
 
 //model type
 
@@ -66,13 +66,13 @@ const problemSchema = new mongoose.Schema<Problem, ProblemModelType>(
 
      submittedBy: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'UserModel',
+      ref: 'User',
       required: true, 
     },
 
     approvedBy: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'UserModel',
+      ref: 'User',
       default: null, 
     },
 
