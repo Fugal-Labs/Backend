@@ -9,7 +9,7 @@ const testCaseSchema = new mongoose.Schema<TestCase, TestCaseModelType>(
   {
     problemId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref:'ProblemModel', 
+    ref:'Problem', 
     required: true,
     },
 
