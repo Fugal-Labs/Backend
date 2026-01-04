@@ -8,7 +8,7 @@ const testResultSchema = new mongoose.Schema<TestResult>(
   {
     testCaseId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'TestCaseModel',
+      ref: 'TestCase',
       required: true,
     },
     status: {
@@ -29,12 +29,12 @@ const submissionSchema = new mongoose.Schema<Submission, SubmissionModelType>(
   {
     userId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'UserModel',
+      ref: 'User',
       required: true,
     },
     problemId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'ProblemModel',
+      ref: 'Problem',
       required: true,
     },
     language: {
