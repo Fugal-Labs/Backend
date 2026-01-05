@@ -2,6 +2,7 @@ import { logger } from '@/logger/logger';
 import UserModel from '@/models/users.model';
 import type { RegistrationData, User, LoginData } from '@/types/users.type';
 import { verifyOtp } from './otp.service';
+import { ApiError } from '@/utils/api-errors';
 
 export const register = async (
   userData: RegistrationData
@@ -9,7 +10,7 @@ export const register = async (
   const existingUser = await UserModel.findOne({ email: userData.email });
   if (existingUser) {
     logger.warn(`Registration attempt with existing email: ${userData.email}`);
-    throw new Error('User with this email already exists');
+    throw new ApiError(409, 'User with this email already exists');
   }
 
   // Verify OTP before proceeding with registration
@@ -39,12 +40,12 @@ export const login = async (
   });
   if (!user) {
     logger.warn(`Login attempt with non-existing email or username: ${userData.credential}`);
-    throw new Error('Invalid email or password');
+    throw new ApiError(401, 'Invalid email or username');
   }
   const isPasswordValid = await user.isPasswordCorrect(userData.password);
   if (!isPasswordValid) {
     logger.warn(`Invalid password attempt for credential: ${userData.credential}`);
-    throw new Error('Invalid email or password');
+    throw new ApiError(401, 'Wrong password');
   }
 
   // Generate both tokens
@@ -63,7 +64,7 @@ export const logout = async (userId: string): Promise<void> => {
   const user = await UserModel.findById(userId);
   if (!user) {
     logger.warn(`Logout attempt for non-existing user ID: ${userId}`);
-    throw new Error('User not found');
+    throw new ApiError(404, 'User not found');
   }
   // Remove refresh token from database
   user.refreshToken = undefined;
@@ -75,7 +76,7 @@ export const getCurrentUser = async (userId: string): Promise<User> => {
   const user = await UserModel.findById(userId);
   if (!user) {
     logger.warn(`Get current user attempt for non-existing user ID: ${userId}`);
-    throw new Error('User not found');
+    throw new ApiError(404, 'User not found');
   }
   return user;
 };
@@ -86,14 +87,14 @@ export const refreshAccessToken = async (
   const user = await UserModel.findOne({ refreshToken });
   if (!user) {
     logger.warn('Refresh token not found in database');
-    throw new Error('Invalid refresh token');
+    throw new ApiError(404, 'Invalid refresh token');
   }
 
   // Verify the refresh token
   const isValid = await user.verifyRefreshToken(refreshToken);
   if (!isValid) {
     logger.warn(`Invalid refresh token for user: ${user.email}`);
-    throw new Error('Invalid refresh token');
+    throw new ApiError(404, 'Invalid refresh token');
   }
 
   // Generate new tokens (token rotation)
@@ -112,7 +113,7 @@ export const logoutAll = async (userId: string): Promise<void> => {
   const user = await UserModel.findById(userId);
   if (!user) {
     logger.warn(`Logout all attempt for non-existing user ID: ${userId}`);
-    throw new Error('User not found');
+    throw new ApiError(404, 'User not found');
   }
 
   // Increment token version to invalidate all refresh tokens
