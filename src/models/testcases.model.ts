@@ -1,15 +1,14 @@
 import mongoose from 'mongoose';
-import type {Types} from 'mongoose';
 import type { TestCase } from '@/types/testcases.type';
 
-type TestCaseModelType = mongoose.Model<TestCase,Record<string, never>>;
+type TestCaseModelType = mongoose.Model<TestCase, Record<string, never>>;
 
 const testCaseSchema = new mongoose.Schema<TestCase, TestCaseModelType>(
   {
     problemId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref:'Problem', 
-    required: true,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Problem',
+      required: true,
     },
 
     type: {
@@ -35,7 +34,7 @@ const testCaseSchema = new mongoose.Schema<TestCase, TestCaseModelType>(
 
     memoryLimit: {
       type: Number,
-      default: 256, 
+      default: 256,
     },
 
     order: {
@@ -49,15 +48,8 @@ const testCaseSchema = new mongoose.Schema<TestCase, TestCaseModelType>(
 );
 
 // Compound index (IMPORTANT for performance)
-testCaseSchema.index(
-  { problemId: 1, type: 1, order: 1 },
-  { unique: true } 
-);
+testCaseSchema.index({ problemId: 1, type: 1, order: 1 }, { unique: true });
 
-
-const TestCaseModel = mongoose.model<TestCase, TestCaseModelType>(
-  'TestCase',
-  testCaseSchema
-);
+const TestCaseModel = mongoose.model<TestCase, TestCaseModelType>('TestCase', testCaseSchema);
 
 export default TestCaseModel;

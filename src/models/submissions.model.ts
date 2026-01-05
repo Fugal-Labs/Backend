@@ -1,6 +1,5 @@
 import mongoose from 'mongoose';
 import type { Submission, TestResult } from '@/types/submission.type';
-import type {Types} from 'mongoose';
 
 type SubmissionModelType = mongoose.Model<Submission>;
 
@@ -22,7 +21,7 @@ const testResultSchema = new mongoose.Schema<TestResult>(
     expectedOutput: { type: String },
     errorMessage: { type: String },
   },
-  { _id: false } // 
+  { _id: false } //
 );
 
 //  Submission schema

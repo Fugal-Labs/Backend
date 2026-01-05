@@ -1,12 +1,8 @@
 import mongoose from 'mongoose';
-import type {Types} from 'mongoose';
 import type { Problem } from '@/types/problems.type';
 //model type
 
-type ProblemModelType = mongoose.Model<
-  Problem,
-  Record<string, never>
->;
+type ProblemModelType = mongoose.Model<Problem, Record<string, never>>;
 
 // problem schema
 
@@ -63,7 +59,7 @@ const problemSchema = new mongoose.Schema<Problem, ProblemModelType>(
       c: { type: String, required: true },
     },
 
-     submittedBy: {
+    submittedBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
     },
@@ -71,7 +67,7 @@ const problemSchema = new mongoose.Schema<Problem, ProblemModelType>(
     approvedBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
-      default: null, 
+      default: null,
     },
 
     status: {
@@ -80,19 +76,16 @@ const problemSchema = new mongoose.Schema<Problem, ProblemModelType>(
       default: 'pending',
     },
 
-  
     rejectionReason: {
       type: String,
-      required: function (this:any) {
-      return this.status === 'rejected';
-    },
-
+      required: function (this: any) {
+        return this.status === 'rejected';
+      },
     },
 
     totalSubmissions: {
       type: Number,
       required: true,
-      
     },
 
     acceptedSubmissions: {
@@ -100,15 +93,15 @@ const problemSchema = new mongoose.Schema<Problem, ProblemModelType>(
       required: true,
     },
   },
-   {
+  {
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
-  },
+  }
 );
 
-//acceptance rate 
+//acceptance rate
 
-problemSchema.virtual("acceptanceRate").get(function () {
+problemSchema.virtual('acceptanceRate').get(function () {
   if (this.totalSubmissions === 0) return 0;
 
   return (this.acceptedSubmissions / this.totalSubmissions) * 100;
@@ -120,10 +113,6 @@ problemSchema.index({ status: 1, difficulty: 1 });
 problemSchema.index({ tags: 1 });
 
 // model
-const ProblemModel = mongoose.model<Problem, ProblemModelType>(
-  'Problem',
-  problemSchema
-);
+const ProblemModel = mongoose.model<Problem, ProblemModelType>('Problem', problemSchema);
 
 export default ProblemModel;
-
