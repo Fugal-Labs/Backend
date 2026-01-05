@@ -762,13 +762,13 @@ import ReactPlayer from 'react-player';
 - [x] **Backend**: Update logout service (remove refreshToken from DB)
 - [x] **Backend**: Create logout-all endpoint (increment tokenVersion)
 - [x] **Backend**: Create admin middleware (check role='admin')
-- [ ] **Frontend**: Create API client library (`lib/api/client.ts`) with auto-refresh logic
-- [ ] **Frontend**: Create AuthProvider context with token refresh handling
-- [ ] **Frontend**: Build login/register pages
-- [ ] **Frontend**: Implement automatic token refresh on 401 responses
-- [ ] **Frontend**: Update CORS_ORIGIN in backend
-- [ ] **Test**: Full auth flow (register → login → wait 15min → auto-refresh → protected route → logout)
-- [ ] **Test**: Multi-device logout (logout-all endpoint)
+- [x] **Frontend**: Create API client library (`lib/api/...`) with auto-refresh logic
+- [x] **Frontend**: Create AuthProvider context with token refresh handling
+- [x] **Frontend**: Build login/register pages
+- [x] **Frontend**: Implement automatic token refresh on 401 responses
+- [x] **Frontend**: Update CORS_ORIGIN in backend
+- [x] **Test**: Full auth flow (register → login → wait 15min → auto-refresh → protected route → logout)
+- [ ] **Test**: Multi-device logout (logout-all endpoint) -- Need to be fixed
 
 **Deliverable**: Working dual-token authentication system with seamless refresh
 
