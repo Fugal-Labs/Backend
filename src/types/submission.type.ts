@@ -2,9 +2,9 @@ import type mongoose from 'mongoose';
 
 // Each test result for a submission
 export interface TestResult {
-  testCaseId: mongoose.Types.ObjectId;  // reference to TestCase
-  status: 'passed' | 'failed' | 'error' | 'timeout'; // result of this test case
-  executionTime: number;                // milliseconds taken by this test case
+  testCaseId: mongoose.Types.ObjectId; 
+  status: 'passed' | 'failed' | 'error' | 'timeout';
+  executionTime: number;                
 
   // Only for sample tests or errors
   actualOutput?: string;

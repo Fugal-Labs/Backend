@@ -188,6 +188,6 @@ userSchema.set('toJSON', {
 userSchema.index({ role: 1 });
 userSchema.index({ refreshToken: 1 });
 
-const User = mongoose.model<User, UserModelType>('User', userSchema);
+const UserModel = mongoose.model<User, UserModelType>('User', userSchema);
 
-export default User;
+export default UserModel;

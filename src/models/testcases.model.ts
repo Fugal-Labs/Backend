@@ -1,6 +1,5 @@
-
 import mongoose from 'mongoose';
-import type { Types } from 'mongoose';
+import type {Types} from 'mongoose';
 import type { TestCase } from '@/types/testcases.type';
 
 type TestCaseModelType = mongoose.Model<TestCase,Record<string, never>>;
@@ -9,7 +8,7 @@ const testCaseSchema = new mongoose.Schema<TestCase, TestCaseModelType>(
   {
     problemId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref:'ProblemModel', 
+    ref:'Problem', 
     required: true,
     },
 
