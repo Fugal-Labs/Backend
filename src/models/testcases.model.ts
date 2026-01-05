@@ -35,7 +35,6 @@ const testCaseSchema = new mongoose.Schema<TestCase, TestCaseModelType>(
 
     memoryLimit: {
       type: Number,
-      required: true,
       default: 256, 
     },
 
