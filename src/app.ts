@@ -6,6 +6,7 @@ import { requestIdMiddleware } from './middlewares/request.middleware';
 import cookieParser from 'cookie-parser';
 import userRouter from './routes/users.routes';
 import otpRouter from './routes/otp.routes';
+import problemRoutes from '../src/routes/problem.routes'
 
 const app = express();
 app.use(
@@ -31,6 +32,9 @@ app.use(requestIdMiddleware);
 
 app.use('/users', userRouter);
 app.use('/otp', otpRouter);
+
+//problems
+app.use('/api/problems', problemRoutes);
 
 app.use(errorHandler);
 
