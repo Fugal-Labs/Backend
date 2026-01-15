@@ -34,7 +34,7 @@ app.use('/users', userRouter);
 app.use('/otp', otpRouter);
 
 //problems
-app.use('/api/problems', problemRoutes);
+app.use('/problems', problemRoutes);
 
 app.use(errorHandler);
 

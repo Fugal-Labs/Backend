@@ -5,7 +5,7 @@ import {
   getProblemBySlug,
   updateProblem,
   deleteProblem,
-} from '../controller/problem.controllers';
+} from '../controller/problem.controller';
 
 const router = Router();
 
