@@ -1,18 +1,12 @@
 import { Router } from 'express';
-import {
-  createProblem,
-  getProblems,
-  getProblemBySlug,
-  updateProblem,
-  deleteProblem,
-} from '../controller/problem.controller';
+import * as problemController from '@/controller/problem.controller'
 
 const router = Router();
 
-router.post('/create', createProblem);
-router.get('/getAll', getProblems);
-router.get('/:slug', getProblemBySlug);
-router.put('/:slug', updateProblem);
-router.delete('/:slug', deleteProblem);
+router.post('/create', problemController.createProblem);
+router.get('/getAll', problemController.getProblems);
+router.get('/:slug', problemController.getProblemBySlug);
+router.put('/:slug', problemController.updateProblem);
+router.delete('/:slug', problemController.deleteProblem);
 
 export default router;

@@ -1,128 +1,89 @@
 import { Request, Response } from 'express';
-import { createProblemService } from '@/services/problem.service';
-import { getProblemsService } from "@/services/problem.service";
-import { getProblemBySlugService } from "@/services/problem.service";
-import { updateProblemService } from '@/services/problem.service';
-import { deleteProblemService } from "@/services/problem.service";
+import * as problemService from "@/services/problem.service";
+import { ApiResponse } from '@/utils/api-response';
+import { asyncHandler } from '@/utils/asyncHandler';
+import {
+  createProblemSchema,
+  slugParamSchema,
+  updateProblemSchema,
+} from "@/validations/problem.validator";
 
+// create problem
+export const createProblem = asyncHandler(async (req:Request, res:Response) => {
+  const payload = createProblemSchema.parse(req.body);
 
-//create problems
+  const problemData = {
 
-export const createProblem = async (req: Request, res: Response) => {
-  try {
-    const problem = await createProblemService({
-      data: req.body,
-    });
+    title: payload.title,
+    slug: payload.slug,
+    difficulty: payload.difficulty,
+    description: payload.description,
+    constraints: payload.constraints,
+    examples: payload.examples ?? [],
+    tags: payload.tags ?? [],
 
-    res.status(201).json({
-      success: true,
-      message: "Problem created successfully",
-      data: problem,
-    });
+    // templates 
+    templates: {
+      python: payload.templates.python ?? "",
+      java: payload.templates.java ?? "",
+      cpp: payload.templates.cpp ?? "",
+      c: payload.templates.c ?? "",
+    },
 
-  } catch (error: any) {
-    res.status(error.statusCode || 500).json({
-      success: false,
-      message: error.message || "Something went wrong",
-      errors: error.errors || [],
-    });
-  }
-};
+    // system generated
+    status: "pending" as const,
+    totalSubmissions: 0,
+    acceptedSubmissions: 0,
+  };
 
-//read problems
+  const problem = await problemService.createProblem(problemData); 
 
-export const getProblems = async (_: Request, res: Response) => {
-  try {
-    const problems = await getProblemsService();
+  res.status(201).json(
+    new ApiResponse(201, problem, "Problem created successfully")
+  );
+});
 
-    res.status(200).json({
-      success: true,
-      message: "Problems fetched successfully",
-      total: problems.length,
-      data: problems,
-    });
+//get all problems
 
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Failed to fetch problems",
-    });
-  }
-};
+export const getProblems = asyncHandler(async (_req:Request, res:Response) => {
+  const problems = await problemService.getAllProblems();
 
+  res.status(200).json(
+    new ApiResponse(200, problems, "Problems fetched successfully")
+  );
+});
 
-//get by slug
+//get single problem
+export const getProblemBySlug = asyncHandler(async (req:Request, res:Response) => {
+  const { slug } = slugParamSchema.parse(req.params);
 
-export const getProblemBySlug = async (req: Request, res: Response) => {
-  try {
-    const { slug } = req.params;
+  const problem = await problemService.getProblemBySlug(slug);
 
-    const problem = await getProblemBySlugService({ slug });
+  res.status(200).json(
+    new ApiResponse(200, problem, "Problem fetched successfully")
+  );
+});
 
-    res.status(200).json({
-      success: true,
-      message: "Problem fetched successfully",
-      data: problem,
-    });
+// get updated problem
+export const updateProblem = asyncHandler(async (req:Request, res:Response) => {
+  const { slug } = slugParamSchema.parse(req.params);
+  const payload = updateProblemSchema.parse(req.body);
 
-  } catch (error: any) {
-    res.status(error.statusCode || 500).json({
-      success: false,
-      message: error.message || "Failed to fetch problem",
-    });
-  }
-};
+  const updated = await problemService.updateProblemBySlug(slug, payload);
 
+  res.status(200).json(
+    new ApiResponse(200, updated, "Problem updated successfully")
+  );
+});
 
+// delete problem
 
-//update problem
+export const deleteProblem = asyncHandler(async (req:Request, res:Response) => {
+  const { slug } = slugParamSchema.parse(req.params);
 
+  await problemService.deleteProblemBySlug(slug);
 
-export const updateProblem = async (req: Request, res: Response) => {
-  try {
-    const { slug } = req.params;
-
-    const updatedProblem = await updateProblemService({
-      slug,
-      payload: req.body,
-    });
-
-    res.status(200).json({
-      success: true,
-      message: "Problem updated successfully",
-      data: updatedProblem,
-    });
-
-  } catch (error: any) {
-    res.status(error.statusCode || 500).json({
-      success: false,
-      message: error.message || "Failed to update problem",
-      errors: error.errors || [],
-    });
-  }
-};
-
-
-
-
-//delete problem
-
-export const deleteProblem = async (req: Request, res: Response) => {
-  try {
-    const { slug } = req.params;
-
-    await deleteProblemService({ slug });
-
-    res.status(200).json({
-      success: true,
-      message: "Problem deleted successfully",
-    });
-
-  } catch (error: any) {
-    res.status(error.statusCode || 500).json({
-      success: false,
-      message: error.message || "Failed to delete problem",
-    });
-  }
-};
-
+  res.status(200).json(
+    new ApiResponse(200, null, "Problem deleted successfully")
+  );
+});
