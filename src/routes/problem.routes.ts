@@ -1,7 +1,10 @@
 import { Router } from 'express';
-import * as problemController from '@/controller/problem.controller'
+import * as problemController from '@/controller/problem.controller';
+import { ipRateLimiter } from '@/middlewares/ipRateLimitter';
 
 const router = Router();
+
+router.use(ipRateLimiter);
 
 router.post('/create', problemController.createProblem);
 router.get('/getAll', problemController.getProblems);
