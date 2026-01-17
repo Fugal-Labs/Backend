@@ -19,10 +19,10 @@ export const createProblemSchema = z.object({
   constraints: z.string().min(1),
   tags: z.array(z.string()).optional(),
   templates: z.object({
-    python: z.any().optional(),
-    java: z.any().optional(),
-    cpp: z.any().optional(),
-    c: z.any().optional(),
+    python: z.string().optional(),
+    java: z.string().optional(),
+    cpp: z.string().optional(),
+    c: z.string().optional(),
   }),
 });
 

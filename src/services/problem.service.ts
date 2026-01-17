@@ -27,7 +27,7 @@ export const getProblemBySlug = async (slug: string) => {
 
 export const updateProblemBySlug = async (
   slug: string,
-  data: any
+  data: Partial<Problem>
 ) => {
   const updated = await ProblemModel.findOneAndUpdate(
     { slug },
