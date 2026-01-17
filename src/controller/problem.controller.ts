@@ -28,7 +28,7 @@ export const createProblem = asyncHandler(async (req:Request, res:Response) => {
       java: payload.templates.java ?? "",
       cpp: payload.templates.cpp ?? "",
       c: payload.templates.c ?? "",
-    },
+    }, 
 
     // system generated
     status: "pending" as const,
